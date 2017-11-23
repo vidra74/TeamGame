@@ -3,8 +3,18 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="bridge.franojancic.com.teamgame.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/secure_connect_scan"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/secure_connect"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/insecure_connect_scan"
+        android:orderInCategory="100"
+        android:title="@string/insecure_connect"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/discoverable"
+        android:orderInCategory="100"
+        android:title="@string/discoverable"
         app:showAsAction="never"/>
 </menu>
