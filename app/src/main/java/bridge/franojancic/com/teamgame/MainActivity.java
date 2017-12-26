@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private BluetoothChatService mChatService = null;
 
-    public String mThreadPoruka;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DoTask().execute();
-                Snackbar.make(view, "Started thread and get message " + mThreadPoruka, Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "FloatingActionButton ", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -144,27 +142,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class DoTask extends AsyncTask<Void, Void, String>{
-        @Override
-        protected String doInBackground(Void... pVoids) {
-            try{
-                Log.i(TAG, "DoTask.doInBackground");
-            } catch (Exception e) {
-                Log.e(TAG, "DoTask.doInBackgroung exception catched", e);
-            }
-            return "DoTask.doInBackground finished";
-        }
-
-        @Override
-        protected void onPostExecute(String pS) {
-            mThreadPoruka = pS;
-        }
-    }
-
     /**
      * Set up the UI and background operations for chat.
      */
-    private void setupChat() {
+    private void setupChat(Boolean isBTENabled) {
         Log.d(TAG, "setupChat()");
 
         // Initialize the array adapter for the conversation thread
@@ -172,7 +153,8 @@ public class MainActivity extends AppCompatActivity {
 
         mConversationView.setAdapter(mConversationArrayAdapter);
 
-        // Initialize the compose field with a listener for the return key
+        // Initialize the c
+        // ompose field with a listener for the return key
         mOutEditText.setOnEditorActionListener(mWriteListener);
 
         // Initialize the send button with a listener that for click events
@@ -187,8 +169,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Initialize the BluetoothChatService to perform bluetooth connections
-        mChatService = new BluetoothChatService(this, mHandler);
-
+        if (isBTENabled) {
+            mChatService = new BluetoothChatService(this, mHandler);
+        }
         // Initialize the buffer for outgoing messages
         mOutStringBuffer = new StringBuffer("");
     }
@@ -214,9 +197,15 @@ public class MainActivity extends AppCompatActivity {
      * @param message A string of text to send.
      */
     private void sendMessage(String message) {
+
+        if (mChatService == null){
+            Toast.makeText(getApplicationContext(), "No BT Adapter so no sending", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         // Check that we're actually connected before trying anything
         if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -300,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
                 // When the request to enable Bluetooth returns
                 if (resultCode == RESULT_OK) {
                     // Bluetooth is now enabled, so set up a chat session
-                    setupChat();
+                    setupChat(true);
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");
@@ -317,12 +306,19 @@ public class MainActivity extends AppCompatActivity {
 
         // If BT is not on, request that it be enabled.
         // setupChat() will then be called during onActivityResult
+
+        if (mBluetoothAdapter == null){
+            Toast.makeText(this, "Nema BT Adaptera", Toast.LENGTH_LONG).show();
+            setupChat(false);
+            return;
+        }
+
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
             // Otherwise, setup the chat session
         } else if (mChatService == null) {
-            setupChat();
+            setupChat(true);
         }
     }
 
