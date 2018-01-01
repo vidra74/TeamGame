@@ -94,14 +94,23 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Bluetooth is not available", Toast.LENGTH_LONG).show();
         }
 
-        Intent i = PollService.newIntent(this);
-        this.startService(i);
+        mPrefText.setText("Poll Service stopped");
+        // PollService.setServiceAlarm(this, true);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem toggleItem = menu.findItem(R.id.PollService);
+        if (PollService.isServiceAlarmOn(this)){
+            toggleItem.setTitle(R.string.preferences_off);
+        } else {
+            toggleItem.setTitle(R.string.preferences_on);
+        }
+
         return true;
     }
 
@@ -144,7 +153,14 @@ public class MainActivity extends AppCompatActivity {
             }
             case R.id.PollService: {
                 // Ensure this device is discoverable by others
-                mPrefText.setText(QueryPreferences.getTestPref(this));
+                boolean shouldStartAlarm = !PollService.isServiceAlarmOn(this);
+                PollService.setServiceAlarm(this, shouldStartAlarm);
+                if (shouldStartAlarm) {
+                    mPrefText.setText("Poll Service started");
+                } else {
+                    mPrefText.setText("Poll Service stopped");
+                }
+                invalidateOptionsMenu();
                 return true;
             }
 
