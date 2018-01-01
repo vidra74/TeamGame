@@ -17,4 +17,9 @@
         android:orderInCategory="100"
         android:title="@string/discoverable"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/PollService"
+        android:orderInCategory="100"
+        android:title="@string/preferences"
+        app:showAsAction="never"/>
 </menu>

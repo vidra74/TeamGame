@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     // Layout Views
     private ListView mConversationView;
     private EditText mOutEditText;
+    private TextView mPrefText;
     private Button mSendButton;
     private TextView mAppText;
 
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         mOutEditText = (EditText) findViewById(R.id.edtText);
         mSendButton = (Button) findViewById(R.id.btnSend);
         mAppText = (TextView) findViewById(R.id.tvTitle);
+        mPrefText = (TextView)findViewById(R.id.textPref);
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -91,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
         if (mBluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "Bluetooth is not available", Toast.LENGTH_LONG).show();
         }
+
+        Intent i = PollService.newIntent(this);
+        this.startService(i);
     }
 
     @Override
@@ -137,6 +142,12 @@ public class MainActivity extends AppCompatActivity {
                 ensureDiscoverable();
                 return true;
             }
+            case R.id.PollService: {
+                // Ensure this device is discoverable by others
+                mPrefText.setText(QueryPreferences.getTestPref(this));
+                return true;
+            }
+
         }
 
         return super.onOptionsItemSelected(item);
