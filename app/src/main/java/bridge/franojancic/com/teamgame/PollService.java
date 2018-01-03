@@ -2,9 +2,12 @@ package bridge.franojancic.com.teamgame;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -37,6 +40,20 @@ public class PollService extends IntentService {
             Log.i(TAG, "Primio intent: " + pIntent);
             QueryPreferences.setTestPref(getApplicationContext(), "Primio intent: " + pIntent);
         }
+        Resources r = getResources();
+        PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(this, DeviceListActivity.class), 0);
+
+        Notification notification = new Notification.Builder(this)
+                .setTicker("Ticker text")
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle("Content Title")
+                .setContentText(QueryPreferences.getTestPref(getApplicationContext()))
+                .setContentIntent(pi)
+                .setAutoCancel(true)
+                .build();
+
+        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(0, notification);
     }
 
     private boolean isNetworkAvailableAndConnected(){
